@@ -10,6 +10,9 @@ class SensorData {
     MKRIoTCarrier carrier;
     float temperature;
     float humidity;
+    float gasResistor;
+    float volatileOrganicCompounds;
+    float co2;
     const char* ssid;
     const char* password;
 

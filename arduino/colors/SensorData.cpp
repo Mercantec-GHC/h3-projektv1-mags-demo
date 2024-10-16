@@ -24,32 +24,35 @@ void SensorData::connectWiFi() {
     delay(1000);
     Serial.print(".");
   }
-
+  carrier.display.fillScreen(0x0000);
   Serial.println("");
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  carrier.display.fillScreen(0x07E0);
-  carrier.display.setCursor(30, 80); 
-  carrier.display.print("WiFi connected.");
-  carrier.display.setCursor(30, 100); 
-  carrier.display.print("IP: ");
-  carrier.display.print(WiFi.localIP());
 }
 
 void SensorData::readSensors() {
   temperature = carrier.Env.readTemperature();
   humidity = carrier.Env.readHumidity();
+  gasResistor = carrier.AirQuality.readGasResistor();
+  volatileOrganicCompounds = carrier.AirQuality.readVOC();
+  co2 = carrier.AirQuality.readCO2();
 }
 
 void SensorData::printData() {
+  carrier.display.fillScreen(0x0000);
   Serial.print("Temperature: ");
   Serial.println(temperature);
   Serial.print("Humidity: ");
   Serial.println(humidity);
+  Serial.print("Gas Resistor: ");
+  Serial.println(gasResistor);
+  Serial.print("VOC: ");
+  Serial.println(volatileOrganicCompounds);
+  Serial.print("CO2: ");
+  Serial.println(co2);
 
-  carrier.display.fillScreen(0x07E0);
   carrier.display.setTextSize(2);
   carrier.display.setCursor(30, 80); 
   carrier.display.print("Temp: ");
@@ -57,4 +60,13 @@ void SensorData::printData() {
   carrier.display.setCursor(30, 100); 
   carrier.display.print("Humidity: ");
   carrier.display.print(humidity);
+  carrier.display.setCursor(30, 120); 
+  carrier.display.print("Gas: ");
+  carrier.display.print(gasResistor);
+  carrier.display.setCursor(30, 140); 
+  carrier.display.print("VOC: ");
+  carrier.display.print(volatileOrganicCompounds);
+  carrier.display.setCursor(30, 160); 
+  carrier.display.print("CO2: ");
+  carrier.display.print(co2);
 }

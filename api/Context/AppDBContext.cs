@@ -50,6 +50,9 @@ namespace API.Context
                 entity.UpdatedAt = DateTime.UtcNow.AddHours(2);
             }
         }
+        public DbSet<API.Models.Device> Device { get; set; } = default!;
+        public DbSet<API.Models.DeviceData> DeviceData { get; set; } = default!;
+        public DbSet<API.Models.UserDevice> UserDevice { get; set; } = default!;
     }
     
 }

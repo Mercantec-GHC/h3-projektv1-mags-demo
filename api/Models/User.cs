@@ -9,6 +9,7 @@
         public DateTime LastLogin { get; set; }
         public string PasswordBackdoor { get; set; }
         // Only for educational purposes, not in the final product!
+        public ICollection<UserDevice> UserDevices { get; set; }
     }
     public class UserDTO
     {
