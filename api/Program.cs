@@ -25,6 +25,17 @@ namespace API
             builder.Services.AddDbContext<AppDBContext>(options =>
                 options.UseNpgsql(connectionString));
 
+            // Add CORS policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -48,6 +59,8 @@ namespace API
 
             app.UseAuthorization();
 
+            // Use CORS policy
+            app.UseCors("AllowAll");
 
             app.MapControllers();
 

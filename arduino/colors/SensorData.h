@@ -4,6 +4,7 @@
 #include <Arduino_MKRIoTCarrier.h>
 #include <SPI.h>
 #include <WiFiNINA.h>
+#include <ArduinoHttpClient.h>
 
 class SensorData {
   private:
@@ -15,6 +16,8 @@ class SensorData {
     float co2;
     const char* ssid;
     const char* password;
+    HttpClient* httpClient;
+    WiFiClient wifiClient; 
 
   public:
     SensorData(const char* ssid, const char* password);
@@ -22,6 +25,7 @@ class SensorData {
     void connectWiFi();
     void readSensors();
     void printData();
+    void sendData();
 };
 
 #endif // SENSORDATA_H

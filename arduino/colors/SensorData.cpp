@@ -8,6 +8,7 @@ void SensorData::begin() {
   carrier.begin();
   Serial.begin(9600); 
   connectWiFi();
+  httpClient = new HttpClient(wifiClient, "h3-projekt2024.onrender.com", 80); // Use WiFiClient
 }
 
 void SensorData::connectWiFi() {
@@ -29,7 +30,6 @@ void SensorData::connectWiFi() {
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-
 }
 
 void SensorData::readSensors() {
@@ -69,4 +69,32 @@ void SensorData::printData() {
   carrier.display.setCursor(30, 160); 
   carrier.display.print("CO2: ");
   carrier.display.print(co2);
+
+  sendData();
+}
+
+void SensorData::sendData() {
+  String postData = "{\"deviceId\":\"10aed77d607b4428b05135cd9629d70f\",";
+  postData += "\"temperature\":" + String(temperature) + ",";
+  postData += "\"humidity\":" + String(humidity) + ",";
+  postData += "\"gasResistor\":" + String(gasResistor) + ",";
+  postData += "\"volatileOrganicCompounds\":" + String(volatileOrganicCompounds) + ",";
+  postData += "\"cO2\":" + String(co2) + "}";
+
+  httpClient->beginRequest();
+  httpClient->post("/api/DeviceDatas");
+  httpClient->sendHeader("Content-Type", "application/json");
+  httpClient->sendHeader("Content-Length", postData.length());
+  httpClient->sendHeader("accept", "text/plain");
+  httpClient->beginBody();
+  httpClient->print(postData);
+  httpClient->endRequest();
+
+  int statusCode = httpClient->responseStatusCode();
+  String response = httpClient->responseBody();
+
+  Serial.print("Status code: ");
+  Serial.println(statusCode);
+  Serial.print("Response: ");
+  Serial.println(response);
 }
