@@ -76,8 +76,15 @@ namespace API.Controllers
         // POST: api/UserDevices
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<UserDevice>> PostUserDevice(UserDevice userDevice)
+        public async Task<ActionResult<UserDevice>> PostUserDevice(UserDeviceDTO userDeviceDTO)
         {
+            var userDevice = new UserDevice
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserId = userDeviceDTO.UserID,
+                DeviceId = userDeviceDTO.DeviceId,
+            };
+
             _context.UserDevice.Add(userDevice);
             try
             {

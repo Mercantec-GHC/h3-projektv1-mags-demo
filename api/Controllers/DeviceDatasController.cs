@@ -23,14 +23,26 @@ namespace API.Controllers
 
         // GET: api/DeviceDatas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DeviceData>>> GetDeviceData()
+        public async Task<ActionResult<IEnumerable<DeviceDataReadDTO>>> GetDeviceData()
         {
-            return await _context.DeviceData.ToListAsync();
+            return await _context.DeviceData
+                .Select(dd => new DeviceDataReadDTO
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    DeviceId = dd.DeviceId,
+                    CreatedAt = dd.CreatedAt,
+                    Temperature = dd.Temperature,
+                    Humidity = dd.Humidity,
+                    GasResistor = dd.GasResistor,
+                    VolatileOrganicCompounds = dd.VolatileOrganicCompounds,
+                    CO2 = dd.CO2
+                })
+                .ToListAsync();
         }
 
         // GET: api/DeviceDatas/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DeviceData>> GetDeviceData(string id)
+        public async Task<ActionResult<DeviceDataReadDTO>> GetDeviceData(string id)
         {
             var deviceData = await _context.DeviceData.FindAsync(id);
 
@@ -39,18 +51,43 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            return deviceData;
+            var deviceDataDTO = new DeviceDataReadDTO
+            {
+                Id = deviceData.Id,
+                DeviceId = deviceData.DeviceId,
+                CreatedAt = deviceData.CreatedAt,
+                Temperature = deviceData.Temperature,
+                Humidity = deviceData.Humidity,
+                GasResistor = deviceData.GasResistor,
+                VolatileOrganicCompounds = deviceData.VolatileOrganicCompounds,
+                CO2 = deviceData.CO2
+            };
+
+            return deviceDataDTO;
         }
 
         // PUT: api/DeviceDatas/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutDeviceData(string id, DeviceData deviceData)
+        public async Task<IActionResult> PutDeviceData(string id, DeviceDataReadDTO deviceDataDTO)
         {
-            if (id != deviceData.Id)
+            if (id != deviceDataDTO.Id)
             {
                 return BadRequest();
             }
+
+            var deviceData = await _context.DeviceData.FindAsync(id);
+            if (deviceData == null)
+            {
+                return NotFound();
+            }
+
+            deviceData.Temperature = deviceDataDTO.Temperature;
+            deviceData.Humidity = deviceDataDTO.Humidity;
+            deviceData.GasResistor = deviceDataDTO.GasResistor;
+            deviceData.VolatileOrganicCompounds = deviceDataDTO.VolatileOrganicCompounds;
+            deviceData.CO2 = deviceDataDTO.CO2;
+            deviceData.UpdatedAt = DateTime.UtcNow;
 
             _context.Entry(deviceData).State = EntityState.Modified;
 
@@ -76,8 +113,21 @@ namespace API.Controllers
         // POST: api/DeviceDatas
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<DeviceData>> PostDeviceData(DeviceData deviceData)
+        public async Task<ActionResult<DeviceDataReadDTO>> PostDeviceData(DeviceDataCreateDTO deviceDataCreateDTO)
         {
+            var deviceData = new DeviceData
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                DeviceId = deviceDataCreateDTO.DeviceId,
+                Temperature = deviceDataCreateDTO.Temperature,
+                Humidity = deviceDataCreateDTO.Humidity,
+                GasResistor = deviceDataCreateDTO.GasResistor,
+                VolatileOrganicCompounds = deviceDataCreateDTO.VolatileOrganicCompounds,
+                CO2 = deviceDataCreateDTO.CO2,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
             _context.DeviceData.Add(deviceData);
             try
             {
@@ -95,7 +145,18 @@ namespace API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetDeviceData", new { id = deviceData.Id }, deviceData);
+            var deviceDataReadDTO = new DeviceDataReadDTO
+            {
+                DeviceId = deviceData.DeviceId,
+                CreatedAt = deviceData.CreatedAt,
+                Temperature = deviceData.Temperature,
+                Humidity = deviceData.Humidity,
+                GasResistor = deviceData.GasResistor,
+                VolatileOrganicCompounds = deviceData.VolatileOrganicCompounds,
+                CO2 = deviceData.CO2
+            };
+
+            return CreatedAtAction("GetDeviceData", new { id = deviceData.Id }, deviceDataReadDTO);
         }
 
         // DELETE: api/DeviceDatas/5
@@ -120,3 +181,4 @@ namespace API.Controllers
         }
     }
 }
+

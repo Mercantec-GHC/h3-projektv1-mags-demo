@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class Device : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,11 +26,35 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    HashedPassword = table.Column<string>(type: "text", nullable: false),
+                    Salt = table.Column<string>(type: "text", nullable: false),
+                    LastLogin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PasswordBackdoor = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DeviceData",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     DeviceId = table.Column<string>(type: "text", nullable: false),
+                    Temperature = table.Column<float>(type: "real", nullable: false),
+                    Humidity = table.Column<float>(type: "real", nullable: false),
+                    GasResistor = table.Column<float>(type: "real", nullable: false),
+                    VolatileOrganicCompounds = table.Column<float>(type: "real", nullable: false),
+                    CO2 = table.Column<float>(type: "real", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -99,6 +123,9 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Device");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

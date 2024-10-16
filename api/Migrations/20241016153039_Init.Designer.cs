@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20241016103430_Device")]
-    partial class Device
+    [Migration("20241016153039_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,9 @@ namespace API.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<float>("CO2")
+                        .HasColumnType("real");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -57,8 +60,20 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<float>("GasResistor")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Humidity")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Temperature")
+                        .HasColumnType("real");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<float>("VolatileOrganicCompounds")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
