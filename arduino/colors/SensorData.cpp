@@ -8,7 +8,7 @@ void SensorData::begin() {
   carrier.begin();
   Serial.begin(9600); 
   connectWiFi();
-  httpClient = new HttpClient(wifiClient, "h3-projekt2024.onrender.com", 80); // Use WiFiClient
+  httpClient = new HttpClient(wifiClient, "h3-projekt2024.onrender.com", 443); 
 }
 
 void SensorData::connectWiFi() {

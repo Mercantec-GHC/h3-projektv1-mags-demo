@@ -28,7 +28,7 @@ namespace API.Controllers
             return await _context.DeviceData
                 .Select(dd => new DeviceDataReadDTO
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = dd.Id,
                     DeviceId = dd.DeviceId,
                     CreatedAt = dd.CreatedAt,
                     Temperature = dd.Temperature,
@@ -124,8 +124,8 @@ namespace API.Controllers
                 GasResistor = deviceDataCreateDTO.GasResistor,
                 VolatileOrganicCompounds = deviceDataCreateDTO.VolatileOrganicCompounds,
                 CO2 = deviceDataCreateDTO.CO2,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow.AddHours(2),
+                UpdatedAt = DateTime.UtcNow.AddHours(2)
             };
 
             _context.DeviceData.Add(deviceData);

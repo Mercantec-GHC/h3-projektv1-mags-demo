@@ -17,7 +17,7 @@ class SensorData {
     const char* ssid;
     const char* password;
     HttpClient* httpClient;
-    WiFiClient wifiClient; 
+    WiFiSSLClient wifiClient; 
 
   public:
     SensorData(const char* ssid, const char* password);

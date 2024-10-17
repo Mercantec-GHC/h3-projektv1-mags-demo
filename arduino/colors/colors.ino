@@ -1,6 +1,6 @@
 #include "SensorData.h"
 
-SensorData sensorData("Fibernet-IA01021636", "hjKwucM");
+SensorData sensorData("Fibernet-IA01021636", "hjKwucMp");
 
 void setup() {
   sensorData.begin();
@@ -9,5 +9,5 @@ void setup() {
 void loop() {
   sensorData.readSensors();
   sensorData.printData();
-  delay(5000); 
+  delay(60000); 
 }
