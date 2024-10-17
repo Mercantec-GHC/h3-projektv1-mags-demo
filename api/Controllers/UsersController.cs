@@ -160,6 +160,8 @@ namespace API.Controllers
                 // Only for educational purposes, not in the final product!
             };
         }
+
+       
         private string GenerateJwtToken(User user)
         {
             var claims = new[]
@@ -170,12 +172,12 @@ namespace API.Controllers
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes
-                (_configuration["JwtSettings:Key"]));
+                (_configuration["JwtSettings:Key"] ?? Environment.GetEnvironmentVariable("JwtKey")));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                _configuration["JwtSettings:Issuer"],
-                _configuration["JwtSettings:Audience"],
+                _configuration["JwtSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JwtIssuer"),
+                _configuration["JwtSettings:Audience"] ?? Environment.GetEnvironmentVariable("JwtAudience"),
                 claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
