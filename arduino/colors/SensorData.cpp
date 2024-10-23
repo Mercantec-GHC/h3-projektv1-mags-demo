@@ -8,7 +8,7 @@ void SensorData::begin() {
   carrier.begin();
   Serial.begin(9600); 
   connectWiFi();
-  httpClient = new HttpClient(wifiClient, "h3-projekt2024.onrender.com", 443); 
+  httpClient = new HttpClient(wifiClient, "h3test.mercantec.tech", 443); 
 }
 
 void SensorData::connectWiFi() {
@@ -80,7 +80,8 @@ void SensorData::sendData() {
   postData += "\"gasResistor\":" + String(gasResistor) + ",";
   postData += "\"volatileOrganicCompounds\":" + String(volatileOrganicCompounds) + ",";
   postData += "\"cO2\":" + String(co2) + "}";
-
+  Serial.println(postData);
+  
   httpClient->beginRequest();
   httpClient->post("/api/DeviceDatas");
   httpClient->sendHeader("Content-Type", "application/json");

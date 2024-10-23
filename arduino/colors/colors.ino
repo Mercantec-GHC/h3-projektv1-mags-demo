@@ -1,6 +1,6 @@
 #include "SensorData.h"
 
-SensorData sensorData("Fibernet-IA01021636", "hjKwucMp");
+SensorData sensorData("MAGS-OLC", "Merc1234!");
 
 void setup() {
   sensorData.begin();
