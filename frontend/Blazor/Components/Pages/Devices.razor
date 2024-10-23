@@ -1,0 +1,45 @@
+﻿@page "/devices"
+@using System.Collections.Generic
+@inject DeviceService DeviceService
+
+<PageTitle>Enheder</PageTitle>
+
+<h1>Enheder</h1>
+
+@if (devices == null)
+{
+    <p>Indlæser enheder...</p>
+}
+else if (!devices.Any())
+{
+    <p>Ingen enheder fundet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Navn</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var device in devices)
+            {
+                <tr>
+                    <td>@device.Id</td>
+                    <td>@device.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Device> devices;
+
+    protected override async Task OnInitializedAsync()
+    {
+        devices = await DeviceService.GetDevicesAsync();
+    }
+}

@@ -1,0 +1,89 @@
+﻿@page "/device-data"
+@using System.Net.Http.Json
+@using API.Models
+@inject HttpClient httpClient
+
+<MudDataGrid T="DeviceDataReadDTO" MultiSelection="true" Items="@deviceDataList" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
+    Hideable="true" RowClick="@RowClicked" RowContextMenuClick="RowRightClicked" SelectedItemsChanged="@SelectedItemsChanged">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Enhedsdata</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Søg" Adornment="Adornment.Start" Immediate="true"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <SelectColumn T="DeviceDataReadDTO" />
+        <PropertyColumn Property="x => x.Id" Title="ID" />
+        <PropertyColumn Property="x => x.DeviceId" Title="Enhed ID" />
+        <PropertyColumn Property="x => x.CreatedAt" Title="Oprettet" Format="dd/MM/yyyy HH:mm:ss"/>
+        <PropertyColumn Property="x => x.Temperature" Title="Temperatur" />
+        <PropertyColumn Property="x => x.Humidity" Title="Luftfugtighed" />
+        <PropertyColumn Property="x => x.GasResistor" Title="Gas Modstand" />
+        <PropertyColumn Property="x => x.VolatileOrganicCompounds" Title="VOC" />
+        <PropertyColumn Property="x => x.CO2" Title="CO2" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="DeviceDataReadDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+<MudExpansionPanels Style="flex:1">
+    <MudExpansionPanel Text="Vis Hændelser">
+        @foreach (var message in _events)
+        {
+            <MudText Typo="@Typo.body2">@message</MudText>
+        }
+        @if(_events.Count > 0) 
+        {
+            <div class="d-flex">
+                <MudSpacer/>
+                <MudButton Class="mt-3" ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick="@(() => _events.Clear())">Ryd</MudButton>
+            </div>
+        }
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    private List<DeviceDataReadDTO> deviceDataList = new List<DeviceDataReadDTO>();
+    private string _searchString;
+    private List<string> _events = new();
+
+    // quick filter - filter globally across multiple columns with the same input
+    private Func<DeviceDataReadDTO, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Id.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.DeviceId.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if ($"{x.Temperature} {x.Humidity} {x.GasResistor} {x.VolatileOrganicCompounds} {x.CO2}".Contains(_searchString))
+            return true;
+
+        return false;
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        deviceDataList = await httpClient.GetFromJsonAsync<List<DeviceDataReadDTO>>("api/DeviceDatas");
+    }
+
+    // events
+    void RowClicked(DataGridRowClickEventArgs<DeviceDataReadDTO> args)
+    {
+        _events.Insert(0, $"Hændelse = Række Klik, Indeks = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+    
+    void RowRightClicked(DataGridRowClickEventArgs<DeviceDataReadDTO> args)
+    {
+        _events.Insert(0, $"Hændelse = Række Højreklik, Indeks = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void SelectedItemsChanged(HashSet<DeviceDataReadDTO> items)
+    {
+        _events.Insert(0, $"Hændelse = Valgte Elementer Ændret, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
+    }
+}

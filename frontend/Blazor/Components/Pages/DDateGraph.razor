@@ -1,0 +1,77 @@
+@page "/ddate-graph"
+@using MudBlazor.Components.Chart.Models
+@using System.Net.Http.Json
+@using API.Models
+@inject HttpClient httpClient
+
+<div>
+    <MudTimeSeriesChart ChartSeries="@_series" @bind-SelectedIndex="Index" Width="100%" Height="350px" ChartOptions="@_options" CanHideSeries TimeLabelSpacing="TimeSpan.FromMinutes(5)" />
+    <MudGrid>
+        <MudItem xs="6">
+            <MudText Typo="Typo.body1" Class="py-3">Valgt: @(Index < 0 ? "Ingen" : _series[Index].Name)</MudText>
+        </MudItem>
+        <MudItem xs="6">
+            <MudSlider @bind-Value="_options.LineStrokeWidth" Min="1" Max="10" Color="Color.Info">Linjebredde: @_options.LineStrokeWidth.ToString()</MudSlider>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code
+{
+    private int Index = -1;
+    private ChartOptions _options = new ChartOptions
+    {
+        YAxisLines = false,
+        YAxisTicks = 10,
+        MaxNumYAxisTicks = 10,
+        YAxisRequireZeroPoint = true,
+        XAxisLines = false,
+        LineStrokeWidth = 1,
+    };
+
+    private TimeSeriesChartSeries _temperatureSeries = new();
+    private TimeSeriesChartSeries _humiditySeries = new();
+    private TimeSeriesChartSeries _co2Series = new();
+
+    private List<TimeSeriesChartSeries> _series = new();
+
+    private List<DeviceDataReadDTO> deviceDataList = new List<DeviceDataReadDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        deviceDataList = await httpClient.GetFromJsonAsync<List<DeviceDataReadDTO>>("api/DeviceDatas");
+
+        _temperatureSeries = new TimeSeriesChartSeries
+        {
+            Index = 0,
+            Name = "Temperatur",
+            Data = deviceDataList.Select(x => new TimeSeriesChartSeries.TimeValue(x.CreatedAt, (double)x.Temperature)).ToList(),
+            IsVisible = true,
+            Type = TimeSeriesDiplayType.Line
+        };
+
+        _humiditySeries = new TimeSeriesChartSeries
+        {
+            Index = 1,
+            Name = "Luftfugtighed",
+            Data = deviceDataList.Select(x => new TimeSeriesChartSeries.TimeValue(x.CreatedAt, (double)x.Humidity)).ToList(),
+            IsVisible = true,
+            Type = TimeSeriesDiplayType.Area
+        };
+
+        _co2Series = new TimeSeriesChartSeries
+        {
+            Index = 2,
+            Name = "CO2",
+            Data = deviceDataList.Select(x => new TimeSeriesChartSeries.TimeValue(x.CreatedAt, (double)x.CO2)).ToList(),
+            IsVisible = true,
+            Type = TimeSeriesDiplayType.Line
+        };
+
+        _series.Add(_temperatureSeries);
+        _series.Add(_humiditySeries);
+        _series.Add(_co2Series);
+
+        StateHasChanged();
+    }
+}

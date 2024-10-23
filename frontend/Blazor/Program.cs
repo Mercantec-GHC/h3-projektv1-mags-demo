@@ -1,4 +1,12 @@
 using Blazor.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
+using System.Net.Http.Json;
+using Blazored.LocalStorage;
+using MudBlazor.Services;
+using Syncfusion.Blazor;
 
 namespace Blazor
 {
@@ -11,6 +19,14 @@ namespace Blazor
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://H3Test.mercantec.tech/") });
+            builder.Services.AddScoped<DeviceService>();
+            builder.Services.AddScoped<DeviceDataService>();
+            builder.Services.AddSyncfusionBlazor();
+            builder.Services.AddMudServices();
 
             var app = builder.Build();
 
