@@ -8,6 +8,5 @@ void setup() {
 
 void loop() {
   sensorData.readSensors();
-  sensorData.printData();
-  delay(60000); 
+  sensorData.printAndSendData();
 }

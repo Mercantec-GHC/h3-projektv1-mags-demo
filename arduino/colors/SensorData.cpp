@@ -40,18 +40,38 @@ void SensorData::readSensors() {
   co2 = carrier.AirQuality.readCO2();
 }
 
+void SensorData::printAndSendData() {
+  static unsigned long lastPrintTime = 0;
+  static unsigned long lastSendTime = 0;
+  unsigned long currentMillis = millis();
+
+  // Print data every second
+  if (currentMillis - lastPrintTime >= 1000) {
+    Serial.println("Printer data");
+    printData();
+    lastPrintTime = currentMillis;
+  }
+
+  // Send data every minute
+  if (currentMillis - lastSendTime >= 6000) {
+    Serial.println("Sender Data");
+    sendData();
+    lastSendTime = currentMillis;
+  }
+}
+
 void SensorData::printData() {
   carrier.display.fillScreen(0x0000);
   Serial.print("Temperature: ");
   Serial.println(temperature);
-  Serial.print("Humidity: ");
+  /*Serial.print("Humidity: ");
   Serial.println(humidity);
   Serial.print("Gas Resistor: ");
   Serial.println(gasResistor);
   Serial.print("VOC: ");
   Serial.println(volatileOrganicCompounds);
   Serial.print("CO2: ");
-  Serial.println(co2);
+  Serial.println(co2);*/
 
   carrier.display.setTextSize(2);
   carrier.display.setCursor(30, 80); 
@@ -68,34 +88,26 @@ void SensorData::printData() {
   carrier.display.print(volatileOrganicCompounds);
   carrier.display.setCursor(30, 160); 
   carrier.display.print("CO2: ");
-  carrier.display.print(co2);
-
-  sendData();
+  carrier.display.print(co2); 
 }
 
 void SensorData::sendData() {
   String postData = "{\"deviceId\":\"10aed77d607b4428b05135cd9629d70f\",";
-  postData += "\"temperature\":" + String(temperature) + ",";
-  postData += "\"humidity\":" + String(humidity) + ",";
-  postData += "\"gasResistor\":" + String(gasResistor) + ",";
-  postData += "\"volatileOrganicCompounds\":" + String(volatileOrganicCompounds) + ",";
-  postData += "\"cO2\":" + String(co2) + "}";
-  Serial.println(postData);
+    postData += "\"temperature\":" + String(temperature) + ",";
+    postData += "\"humidity\":" + String(humidity) + ",";
+    postData += "\"gasResistor\":" + String(gasResistor) + ",";
+    postData += "\"volatileOrganicCompounds\":" + String(volatileOrganicCompounds) + ",";
+    postData += "\"cO2\":" + String(co2) + "}";
+    Serial.println(postData);
+
+    httpClient->beginRequest();
+    httpClient->post("/api/DeviceDatas");
+    httpClient->sendHeader("Content-Type", "application/json");
+    httpClient->sendHeader("Content-Length", postData.length());
+    httpClient->sendHeader("accept", "text/plain");
+    httpClient->beginBody();
+    httpClient->print(postData);
+    httpClient->endRequest();
+
   
-  httpClient->beginRequest();
-  httpClient->post("/api/DeviceDatas");
-  httpClient->sendHeader("Content-Type", "application/json");
-  httpClient->sendHeader("Content-Length", postData.length());
-  httpClient->sendHeader("accept", "text/plain");
-  httpClient->beginBody();
-  httpClient->print(postData);
-  httpClient->endRequest();
-
-  int statusCode = httpClient->responseStatusCode();
-  String response = httpClient->responseBody();
-
-  Serial.print("Status code: ");
-  Serial.println(statusCode);
-  Serial.print("Response: ");
-  Serial.println(response);
 }

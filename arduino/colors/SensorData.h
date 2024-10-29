@@ -26,6 +26,7 @@ class SensorData {
     void readSensors();
     void printData();
     void sendData();
+    void printAndSendData();
 };
 
 #endif // SENSORDATA_H
