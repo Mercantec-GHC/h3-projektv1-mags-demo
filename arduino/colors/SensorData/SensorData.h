@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
 #include <ArduinoHttpClient.h>
+#include <SD.h>
 
 class SensorData {
   private:
@@ -14,15 +15,19 @@ class SensorData {
     float gasResistor;
     float volatileOrganicCompounds;
     float co2;
-    const char* ssid;
-    const char* password;
     HttpClient* httpClient;
-    WiFiSSLClient wifiClient; 
-
+    WiFiSSLClient wifiClient;
+    WiFiServer server;
+    bool configMode;
+    void loadWiFiCredentials();
+    void saveWiFiCredentials(const String& ssid, const String& pass);
+    const char* CONFIG_FILE = "/wifi_config.txt";  
+    
   public:
-    SensorData(const char* ssid, const char* password);
+    SensorData();
     void begin();
     void connectWiFi();
+    void handleConfig();
     void readSensors();
     void printData();
     void sendData();
